@@ -13,13 +13,17 @@ typedef enum {
     EXPR_SUB,
     EXPR_MUL,
     EXPR_DIV,
-    EXPR_NEG
+    EXPR_NEG,
+    EXPR_SYMBOL
 } expr_oper_type_t;
 
 typedef struct ExprNode {
     struct ExprNode *node1, *node2;
     expr_oper_type_t type;
-    double           data;
+    union {
+        double             data;
+        unsigned long long symbol_id;
+    };
 } expr_node_t;
 
 void printExprNode(expr_node_t* pent);

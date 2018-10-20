@@ -11,12 +11,16 @@ typedef enum {
     TOKEN_OPER_DIV,
     TOKEN_OPER_LBRACE,
     TOKEN_OPER_RBRACE,
+    TOKEN_SYMBOL,
     TOKEN_SYNTAX_ERROR
 } token_type_t;
 
 typedef struct {
     token_type_t type;
-    double       data;
+    union {
+        double             data;
+        unsigned long long symbol_id;
+    };
 } token_t;
 
 int     tokenizerInit();

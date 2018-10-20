@@ -1,4 +1,6 @@
 #include "expression_calc_util.h"
+#include "math.h"
+#include "symbols.h"
 
 double expr_oper_add(double l, double r)
 {
@@ -25,6 +27,24 @@ double expr_oper_neg(double l)
     return -l;
 }
 
+double expr_symbol(double l, unsigned long long id)
+{
+    switch (id) {
+    case SYMBOL_SIN:
+        return sin(l);
+    case SYMBOL_COS:
+        return cos(l);
+    case SYMBOL_TAN:
+        return tan(l);
+    case SYMBOL_LOG:
+        return log(l);
+    case SYMBOL_EXP:
+        return exp(l);
+    default:
+        return expr_oper_div(0, 0);
+    }
+}
+
 double expr_tree_calc(expr_node_t* node)
 {
     double ret;
@@ -46,6 +66,9 @@ double expr_tree_calc(expr_node_t* node)
         break;
     case EXPR_NEG:
         ret = expr_oper_neg(expr_tree_calc(node->node1));
+        break;
+    case EXPR_SYMBOL:
+        ret = expr_symbol(expr_tree_calc(node->node1), node->symbol_id);
         break;
     default:
         ret = expr_oper_div(0, 0);

@@ -1,4 +1,5 @@
 #include "expression.h"
+#include "symbols.h"
 
 expr_node_t* newExprNode()
 {
@@ -41,6 +42,9 @@ void printExprNode(expr_node_t* pent)
     case EXPR_NEG:
         printf("EXPR_NEG ");
         break;
+
+    case EXPR_SYMBOL:
+        printf("EXPR_SYMBOL#%llu ", pent->symbol_id);
     }
 }
 
@@ -95,10 +99,24 @@ expr_node_t* getExactFactor(token_t** tokens)
         if (ret == NULL || (*tokens)[0].type != TOKEN_OPER_RBRACE) {
             *tokens = backup;
             if (ret != NULL)
-                freeExprTree(ret);
+                freeExprTree(ret),
+                    ret = NULL;
         }
         else {
             (*tokens)++;
+        }
+        break;
+    case TOKEN_SYMBOL:
+        ret            = newExprNode();
+        ret->type      = EXPR_SYMBOL;
+        ret->symbol_id = (*tokens)[0].symbol_id;
+        (*tokens)++;
+        ret->node1 = getExactFactor(tokens);
+
+        if (ret->node1 == NULL) {
+            *tokens = backup;
+            freeExprTree(ret);
+            ret = NULL;
         }
         break;
     default:

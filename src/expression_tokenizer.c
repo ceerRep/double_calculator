@@ -2,8 +2,10 @@
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "expression_tokenizer.h"
+#include "symbols.h"
 
 #define DOUBLE_NUM_BEFORE_DOT 1
 #define DOUBLE_NUM_AFTER_DOT 3
@@ -13,17 +15,20 @@
 
 const char* double_pattern = "^([0-9]*)(\\.?)([0-9]*)(([eE])([+-]?)([0-9]+))?";
 const char* oper_pattern   = "^[*/()+-]";
+const char* symbol_pattern = "^[A-Za-z0-9][A-Za-z0-9_]*";
 
 const size_t nmatch = 10;
 regmatch_t   pmatch[nmatch];
 
 regex_t double_reg;
 regex_t oper_reg;
+regex_t symbol_reg;
 
 int tokenizerInit()
 {
     return regcomp(&double_reg, double_pattern, REG_EXTENDED)
-           || regcomp(&oper_reg, oper_pattern, REG_EXTENDED);
+           || regcomp(&oper_reg, oper_pattern, REG_EXTENDED)
+           || regcomp(&symbol_reg, symbol_pattern, REG_EXTENDED);
 }
 
 int isMismatched(regmatch_t pm)
@@ -51,6 +56,75 @@ int checkIfOper(const char* str)
         return 1;
 }
 
+int checkIfSymbol(const char* str)
+{
+    if (regexec(&symbol_reg, str, nmatch, pmatch, 0))
+        return 0;
+    else
+        return 1;
+}
+
+void setIMME(token_t* pt, char* str)
+{
+    pt->type = TOKEN_IMME;
+    pt->data = atof(str);
+}
+
+void setOper(token_t* pt, char* str)
+{
+    switch (*str) {
+    case '+':
+        pt->type = TOKEN_OPER_ADD;
+        break;
+    case '-':
+        pt->type = TOKEN_OPER_SUB;
+        break;
+    case '*':
+        pt->type = TOKEN_OPER_MUL;
+        break;
+    case '/':
+        pt->type = TOKEN_OPER_DIV;
+        break;
+    case '(':
+        pt->type = TOKEN_OPER_LBRACE;
+        break;
+    case ')':
+        pt->type = TOKEN_OPER_RBRACE;
+        break;
+    default:
+        pt->type = TOKEN_SYNTAX_ERROR;
+        break;
+    }
+}
+
+void setSymbol(token_t* pt, char* str)
+{
+    static char name[1024];
+
+    int len  = pmatch[0].rm_eo - pmatch[0].rm_so;
+    pt->type = TOKEN_SYMBOL;
+    memcpy(name, str, pmatch[0].rm_eo - pmatch[0].rm_so);
+    name[len] = 0;
+
+    if (strcmp(name, "sin") == 0) {
+        pt->symbol_id = SYMBOL_SIN;
+    }
+    else if (strcmp(name, "cos") == 0) {
+        pt->symbol_id = SYMBOL_COS;
+    }
+    else if (strcmp(name, "tan") == 0) {
+        pt->symbol_id = SYMBOL_TAN;
+    }
+    else if (strcmp(name, "log") == 0) {
+        pt->symbol_id = SYMBOL_LOG;
+    }
+    else if (strcmp(name, "exp") == 0) {
+        pt->symbol_id = SYMBOL_EXP;
+    }
+
+    printf("%s#", name);
+}
+
 token_t getNextToken(char** const str)
 {
     token_t ret;
@@ -58,40 +132,21 @@ token_t getNextToken(char** const str)
     while ((**str) && isspace(**str))
         (*str)++;
     if (!(**str)) {
-        ret.type = TOKEN_SYNTAX_ERROR;
+        ret.type = TOKEN_LIST_END;
         return ret;
     }
 
     if (checkIfIMME(*str)) {
-        ret.type = TOKEN_IMME;
-        ret.data = atof(*str);
+        setIMME(&ret, *str);
         printf("IMME#%.1le ", ret.data);
     }
     else if (checkIfOper(*str)) {
-        switch (**str) {
-        case '+':
-            ret.type = TOKEN_OPER_ADD;
-            break;
-        case '-':
-            ret.type = TOKEN_OPER_SUB;
-            break;
-        case '*':
-            ret.type = TOKEN_OPER_MUL;
-            break;
-        case '/':
-            ret.type = TOKEN_OPER_DIV;
-            break;
-        case '(':
-            ret.type = TOKEN_OPER_LBRACE;
-            break;
-        case ')':
-            ret.type = TOKEN_OPER_RBRACE;
-            break;
-        default:
-            ret.type = TOKEN_SYNTAX_ERROR;
-            break;
-        }
+        setOper(&ret, *str);
         printf("OPER#%c ", **str);
+    }
+    else if (checkIfSymbol(*str)) {
+        setSymbol(&ret, *str);
+        printf("SYMBOL ");
     }
     else {
         ret.type = TOKEN_SYNTAX_ERROR;
