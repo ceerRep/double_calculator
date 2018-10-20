@@ -10,7 +10,8 @@ typedef enum {
     TOKEN_OPER_DIV,
     TOKEN_OPER_LBRACE,
     TOKEN_OPER_RBRACE,
-    TOKEN_SYNTAX_ERROR
+    TOKEN_SYNTAX_ERROR,
+    TOKEN_LIST_END
 } token_type_t;
 
 typedef struct {
@@ -18,6 +19,7 @@ typedef struct {
     double       data;
 } token_t;
 
+int     tokenizerInit();
 token_t getNextToken(char** const str);
 
 #endif

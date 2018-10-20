@@ -1,17 +1,18 @@
 #include <ctype.h>
 #include <regex.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "expression_tokenizer.h"
 
-#define DOUBLE_SIGN 1
-#define DOUBLE_NUM_BEFORE_DOT 2
+#define DOUBLE_NUM_BEFORE_DOT 1
 #define DOUBLE_NUM_AFTER_DOT 3
 #define DOUBLE_EXPO_START 5
 #define DOUBLE_EXPO_SIGN 6
 #define DOUBLE_EXPO_VAL 7
 
-const char* double_pattern = "^([+-]?)([0-9]*)\\.([0-9]*)(([eE])([+-]?)([0-9]+))?";
-const char* oper_pattern   = "^[+-\\*/]";
+const char* double_pattern = "^([0-9]*)(\\.?)([0-9]*)(([eE])([+-]?)([0-9]+))?";
+const char* oper_pattern   = "^[*/()+-]";
 
 const size_t nmatch = 10;
 regmatch_t   pmatch[nmatch];
@@ -63,9 +64,11 @@ token_t getNextToken(char** const str)
 
     if (checkIfIMME(*str)) {
         ret.type = TOKEN_IMME;
+        ret.data = atof(*str);
+        printf("IMME#%.1le ", ret.data);
     }
     else if (checkIfOper(*str)) {
-        switch (*str) {
+        switch (**str) {
         case '+':
             ret.type = TOKEN_OPER_ADD;
             break;
@@ -88,10 +91,13 @@ token_t getNextToken(char** const str)
             ret.type = TOKEN_SYNTAX_ERROR;
             break;
         }
-        return ret;
+        printf("OPER#%c ", **str);
     }
     else {
         ret.type = TOKEN_SYNTAX_ERROR;
-        return ret;
     }
+    if (ret.type != TOKEN_SYNTAX_ERROR) {
+        *str += pmatch[0].rm_eo - pmatch[0].rm_so;
+    }
+    return ret;
 }
