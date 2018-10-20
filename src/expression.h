@@ -1,6 +1,6 @@
-#ifndef _EXPRESSION_H
+#ifndef _EXPR_H
 
-#define _EXPRESSION_H
+#define _EXPR_H
 
 #include <stdio.h>
 #include <stdlib.h>

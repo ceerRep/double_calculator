@@ -3,6 +3,7 @@
 #define _EXPR_TOKENIZER_H
 
 typedef enum {
+    TOKEN_LIST_END = 0,
     TOKEN_IMME,
     TOKEN_OPER_ADD,
     TOKEN_OPER_SUB,
@@ -10,8 +11,7 @@ typedef enum {
     TOKEN_OPER_DIV,
     TOKEN_OPER_LBRACE,
     TOKEN_OPER_RBRACE,
-    TOKEN_SYNTAX_ERROR,
-    TOKEN_LIST_END
+    TOKEN_SYNTAX_ERROR
 } token_type_t;
 
 typedef struct {

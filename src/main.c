@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "expression.h"
+#include "expression_calc_util.h"
 #include "expression_tokenizer.h"
 
 int      num = 0;
@@ -23,7 +24,9 @@ int main(void)
 
     expr_node_t* node = createExprTree(&begin);
     printExprNode(node);
-    puts("");
+    puts("\v");
+
+    printf("%lf\n", expr_tree_calc(node));
 
     return 0;
 }
