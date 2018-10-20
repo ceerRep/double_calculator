@@ -17,16 +17,24 @@ int main(void)
 
     while (*p)
         if ((tokens[num++] = getNextToken(&p)).type == TOKEN_SYNTAX_ERROR) {
-            puts("SYNTAX ERROR");
-            break;
+            puts("SYNTAX ERROR ON TOKENIZING");
+            exit(0);
         }
     puts("\v");
 
     expr_node_t* node = createExprTree(&begin);
+
+    if (node == NULL || begin->type != TOKEN_LIST_END) {
+        puts("SYNTAX ERROR ON PARSING");
+        exit(0);
+    }
+
     printExprNode(node);
     puts("\v");
 
     printf("%lf\n", expr_tree_calc(node));
+
+    freeExprTree(node);
 
     return 0;
 }
