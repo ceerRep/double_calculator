@@ -20,7 +20,7 @@ void printExprNode(expr_node_t* pent)
     printExprNode(pent->node2);
     switch (pent->type) {
     case EXPR_IMME:
-        printf("EXPR_IMME#%.1le ", pent->data);
+        printf("EXPR_IMME#%.1le ", REINTERPRET_TO_DOUBLE(pent->data));
         break;
 
     case EXPR_ADD:

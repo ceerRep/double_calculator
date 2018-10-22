@@ -93,5 +93,6 @@ DOUBLET doubleTMul(DOUBLET l,
                    DOUBLET r);
 DOUBLET doubleTDiv(DOUBLET l,
                    DOUBLET r);
+DOUBLET doubleTNeg(DOUBLET l);
 
 #endif

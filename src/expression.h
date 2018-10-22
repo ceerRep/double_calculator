@@ -21,7 +21,7 @@ typedef struct ExprNode {
     struct ExprNode *node1, *node2;
     expr_oper_type_t type;
     union {
-        double             data;
+        DOUBLET            data;
         unsigned long long symbol_id;
     };
 } expr_node_t;

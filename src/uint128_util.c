@@ -15,6 +15,14 @@ _Bool uint128IsnZero(UINT128 u128)
     return u128.low | u128.high;
 }
 
+UINT128 UINT128Make(uint64_t high, uint64_t low)
+{
+    UINT128 ans;
+    ans.low  = low;
+    ans.high = high;
+    return ans;
+}
+
 UINT128 UINT128Add(UINT128 u128l,
                    UINT128 u128r)
 {

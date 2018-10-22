@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "double_t_util.h"
 #include "expression_tokenizer.h"
 #include "symbols.h"
 
 #define DOUBLE_NUM_BEFORE_DOT 1
 #define DOUBLE_NUM_AFTER_DOT 3
-#define DOUBLE_EXPO_START 5
+#define DOUBLE_EXPO_START 4
 #define DOUBLE_EXPO_SIGN 6
 #define DOUBLE_EXPO_VAL 7
 
@@ -67,7 +68,20 @@ int checkIfSymbol(const char* str)
 void setIMME(token_t* pt, char* str)
 {
     pt->type = TOKEN_IMME;
-    pt->data = atof(str);
+
+    char* int_num = pmatch[DOUBLE_NUM_BEFORE_DOT].rm_so < pmatch[DOUBLE_NUM_BEFORE_DOT].rm_eo
+                        ? str + pmatch[DOUBLE_NUM_BEFORE_DOT].rm_so
+                        : NULL;
+
+    char* frac_num = pmatch[DOUBLE_NUM_AFTER_DOT].rm_so < pmatch[DOUBLE_NUM_AFTER_DOT].rm_eo
+                         ? str + pmatch[DOUBLE_NUM_AFTER_DOT].rm_so
+                         : NULL;
+
+    signed expo = pmatch[DOUBLE_EXPO_START].rm_so < pmatch[DOUBLE_EXPO_START].rm_eo
+                      ? atoi(str + pmatch[DOUBLE_EXPO_START].rm_so + 1)
+                      : 0;
+
+    pt->data = float10ToDOUBLET(int_num, frac_num, expo);
 }
 
 void setOper(token_t* pt, char* str)
@@ -121,8 +135,11 @@ void setSymbol(token_t* pt, char* str)
     else if (strcmp(name, "exp") == 0) {
         pt->symbol_id = SYMBOL_EXP;
     }
+    else if (strcmp(name, "read") == 0) {
+        pt->symbol_id = SYMBOL_READ;
+    }
 
-    printf("%s#", name);
+    //printf("%s#", name);
 }
 
 token_t getNextToken(char** const str)
@@ -138,15 +155,15 @@ token_t getNextToken(char** const str)
 
     if (checkIfIMME(*str)) {
         setIMME(&ret, *str);
-        printf("IMME#%.1le ", ret.data);
+        //printf("IMME#%.1le ", ret.data);
     }
     else if (checkIfOper(*str)) {
         setOper(&ret, *str);
-        printf("OPER#%c ", **str);
+        //printf("OPER#%c ", **str);
     }
     else if (checkIfSymbol(*str)) {
         setSymbol(&ret, *str);
-        printf("SYMBOL ");
+        //printf("SYMBOL ");
     }
     else {
         ret.type = TOKEN_SYNTAX_ERROR;

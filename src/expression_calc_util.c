@@ -2,52 +2,63 @@
 #include "math.h"
 #include "symbols.h"
 
-double expr_oper_add(double l, double r)
+DOUBLET expr_oper_add(DOUBLET l, DOUBLET r)
 {
-    return l + r;
+    return doubleTAdd(l, r);
 }
 
-double expr_oper_sub(double l, double r)
+DOUBLET expr_oper_sub(DOUBLET l, DOUBLET r)
 {
-    return l - r;
+    return doubleTSub(l, r);
 }
 
-double expr_oper_mul(double l, double r)
+DOUBLET expr_oper_mul(DOUBLET l, DOUBLET r)
 {
-    return l * r;
+    return doubleTMul(l, r);
 }
 
-double expr_oper_div(double l, double r)
+DOUBLET expr_oper_div(DOUBLET l, DOUBLET r)
 {
-    return l / r;
+    return doubleTDiv(l, r);
 }
 
-double expr_oper_neg(double l)
+DOUBLET expr_oper_neg(DOUBLET l)
 {
-    return -l;
+    return doubleTNeg(l);
 }
 
-double expr_symbol(double l, unsigned long long id)
+DOUBLET expr_symbol(DOUBLET l, unsigned long long id)
 {
+    double x;
+    double t = REINTERPRET_TO_DOUBLE(l);
     switch (id) {
     case SYMBOL_SIN:
-        return sin(l);
+        x = sin(t);
+        break;
     case SYMBOL_COS:
-        return cos(l);
+        x = cos(t);
+        break;
     case SYMBOL_TAN:
-        return tan(l);
+        x = tan(t);
+        break;
     case SYMBOL_LOG:
-        return log(l);
+        x = log(t);
+        break;
     case SYMBOL_EXP:
-        return exp(l);
+        x = exp(t);
+        break;
+    case SYMBOL_READ:
+        scanf("%lf", &x);
+        break;
     default:
-        return expr_oper_div(0, 0);
+        x = 0.0 / 0.0;
     }
+    return REINTERPRET_TO_DOUBLET(x);
 }
 
-double expr_tree_calc(expr_node_t* node)
+DOUBLET expr_tree_calc(expr_node_t* node)
 {
-    double ret;
+    DOUBLET ret;
     switch (node->type) {
     case EXPR_IMME:
         ret = node->data;
@@ -71,7 +82,7 @@ double expr_tree_calc(expr_node_t* node)
         ret = expr_symbol(expr_tree_calc(node->node1), node->symbol_id);
         break;
     default:
-        ret = expr_oper_div(0, 0);
+        doubleTSetNan(&ret);
         break;
     }
 

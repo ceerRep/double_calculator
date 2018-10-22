@@ -7,5 +7,6 @@
 #define SYMBOL_TAN 3
 #define SYMBOL_LOG 4
 #define SYMBOL_EXP 5
+#define SYMBOL_READ 6
 
 #endif

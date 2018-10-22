@@ -473,3 +473,9 @@ DOUBLET doubleTDiv(DOUBLET l,
     DOUBLED ans = doubleDDiv(REINTERPRET_TO_DOUBLED(l), REINTERPRET_TO_DOUBLED(r));
     return REINTERPRET_TO_DOUBLET(ans);
 }
+DOUBLET doubleTNeg(DOUBLET l)
+{
+    DOUBLED ans = REINTERPRET_TO_DOUBLED(l);
+    ans.sign ^= 1;
+    return REINTERPRET_TO_DOUBLET(ans);
+}

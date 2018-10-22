@@ -2,6 +2,8 @@
 
 #define _EXPR_TOKENIZER_H
 
+#include "double_t.h"
+
 typedef enum {
     TOKEN_LIST_END = 0,
     TOKEN_IMME,
@@ -18,7 +20,7 @@ typedef enum {
 typedef struct {
     token_type_t type;
     union {
-        double             data;
+        DOUBLET            data;
         unsigned long long symbol_id;
     };
 } token_t;
