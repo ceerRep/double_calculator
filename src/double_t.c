@@ -3,6 +3,20 @@
 #include "double_t.h"
 #include "uint128_util.h"
 
+#define EXPO_BIAS ((1ll << (EXPO_WIDTH - 1)) - 1)
+#define EXPO_SPEC ((1ll << EXPO_WIDTH) - 1)
+//#define EXPO_MAX ((1ll << EXPO_WIDTH) - 2 - EXPO_BIAS)
+#define EXPO_MAX ((1ll << EXPO_WIDTH) - 2)
+
+#define CALC_UNIT_WIDTH 128
+#define CALC_UNIT_WIDTH_HALF (CALC_UNIT_WIDTH >> 1)
+#define CALC_TOP_BIT_HALF (1ull << (CALC_UNIT_WIDTH_HALF - 1))
+#define CALC_SHIFT_WIDTH (CALC_UNIT_WIDTH_HALF - VAL_WIDTH - 1)
+#define CALC_SHIFT_MASK(x) ((1 << (x)) - 1)
+#define CALC_SHIFT_HALF(x) (1 << ((x)-1))
+
+#define VAL_INF 0
+
 /*
  *  double_t operations begin
  */
@@ -71,11 +85,14 @@ int doubleDSetVal(DOUBLED* pbad,
                   signed   expo,
                   UINT128* pu128cutNum)
 {
-    UINT128 u128toCut;
+    UINT128 u128_to_cut;
 
     expo += EXPO_BIAS;
 
     int num = UINT128Clz(u128v);
+
+    if (num == 128)
+        expo = 0;
 
     int shlnum = 0, shrnum = 0;
 
@@ -85,14 +102,6 @@ int doubleDSetVal(DOUBLED* pbad,
         expo -= tmp;
         shlnum += num;
     }
-
-    /*
-    while (num > (CALC_UNIT_WIDTH - VAL_WIDTH - 1) && expo > 1) {
-        num--;
-        expo--;
-        shlnum++;
-    }
-    */
 
     u128v = UINT128Shl(u128v, shlnum);
 
@@ -118,11 +127,11 @@ int doubleDSetVal(DOUBLED* pbad,
     }
 
     if (shrnum) {
-        u128toCut = UINT128Shr(UINT128Shl(u128v,
-                                          CALC_UNIT_WIDTH - shrnum),
-                               CALC_UNIT_WIDTH - shrnum);
+        u128_to_cut = UINT128Shr(UINT128Shl(u128v,
+                                            CALC_UNIT_WIDTH - shrnum),
+                                 CALC_UNIT_WIDTH - shrnum);
         if (pu128cutNum) {
-            *pu128cutNum = u128toCut;
+            *pu128cutNum = u128_to_cut;
         }
         u128v = UINT128Shr(u128v, shrnum);
     }
@@ -136,6 +145,7 @@ int doubleDSetVal(DOUBLED* pbad,
 
     //rounding
     //DONE
+
     if (shrnum > 0 && shrnum <= 128) {
         UINT128 u128toCmp;
 
@@ -144,7 +154,7 @@ int doubleDSetVal(DOUBLED* pbad,
 
         u128toCmp = UINT128Shl(u128toCmp, shrnum - 1);
 
-        switch (UINT128Cmp(u128toCut, u128toCmp)) {
+        switch (UINT128Cmp(u128_to_cut, u128toCmp)) {
         case 0:
             if (!(pbad->val & 1))
                 break;

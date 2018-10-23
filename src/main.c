@@ -10,14 +10,15 @@ int      num = 0;
 token_t  tokens[1024];
 token_t* begin = tokens;
 
+void Init()
+{
+    tokenizerInit();
+    doubleUtilInit();
+}
+
 int main(void)
 {
-
-    //DOUBLET naive = float10ToDOUBLET("2", "225073858507200394958941034839315711", -308);
-
-    //printf("%lf\n", 1e100);
-
-    tokenizerInit();
+    Init();
     char  str[1024];
     char* p = str;
     fgets(str, sizeof str, stdin);
@@ -28,7 +29,6 @@ int main(void)
             exit(0);
         }
     }
-    //puts("\v");
 
     expr_node_t* node = createExprTree(&begin);
 
@@ -37,12 +37,9 @@ int main(void)
         exit(0);
     }
 
-    //printExprNode(node);
-    //puts("\v");
-
     DOUBLET ans = expr_tree_calc(node);
 
-    printf("%le\n", REINTERPRET_TO_DOUBLE(ans));
+    printf("%s\n", DOUBLETToString(ans));
 
     freeExprTree(node);
 

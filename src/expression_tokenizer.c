@@ -14,12 +14,13 @@
 #define DOUBLE_EXPO_SIGN 6
 #define DOUBLE_EXPO_VAL 7
 
+#define NMATCH 10
+
 const char* double_pattern = "^([0-9]*)(\\.?)([0-9]*)(([eE])([+-]?)([0-9]+))?";
 const char* oper_pattern   = "^[*/()+-]";
 const char* symbol_pattern = "^[A-Za-z0-9][A-Za-z0-9_]*";
 
-const size_t nmatch = 10;
-regmatch_t   pmatch[nmatch];
+regmatch_t pmatch[NMATCH];
 
 regex_t double_reg;
 regex_t oper_reg;
@@ -39,7 +40,7 @@ int isMismatched(regmatch_t pm)
 
 int checkIfIMME(const char* str)
 {
-    if (regexec(&double_reg, str, nmatch, pmatch, 0)) {
+    if (regexec(&double_reg, str, NMATCH, pmatch, 0)) {
         return 0;
     }
     else if (isMismatched(pmatch[DOUBLE_NUM_BEFORE_DOT]) && isMismatched(pmatch[DOUBLE_NUM_AFTER_DOT])) {
@@ -51,7 +52,7 @@ int checkIfIMME(const char* str)
 
 int checkIfOper(const char* str)
 {
-    if (regexec(&oper_reg, str, nmatch, pmatch, 0))
+    if (regexec(&oper_reg, str, NMATCH, pmatch, 0))
         return 0;
     else
         return 1;
@@ -59,7 +60,7 @@ int checkIfOper(const char* str)
 
 int checkIfSymbol(const char* str)
 {
-    if (regexec(&symbol_reg, str, nmatch, pmatch, 0))
+    if (regexec(&symbol_reg, str, NMATCH, pmatch, 0))
         return 0;
     else
         return 1;
