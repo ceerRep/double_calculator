@@ -201,9 +201,11 @@ DOUBLED doubleDAdd(DOUBLED l,
                    DOUBLED r)
 {
     if (doubleDIsInf(l) || doubleDIsInf(r)) {
-        if (doubleDIsInf(r) && (l.sign ^ r.sign)) {
-            doubleDSetNan(&l);
+        if (doubleDIsInf(l) && doubleDIsInf(r)) {
+            if (l.sign ^ r.sign) {}
         }
+        else if (!doubleDIsInf(r))
+            l = r;
         return l;
     }
 
@@ -251,8 +253,14 @@ DOUBLED doubleDSub(DOUBLED l,
                    DOUBLED r)
 {
     if (doubleDIsInf(l) || doubleDIsInf(r)) {
-        if (doubleDIsInf(r) && !(l.sign ^ r.sign)) {
-            doubleDSetNan(&l);
+        if (doubleDIsInf(l) && doubleDIsInf(r)) {
+            if (!(l.sign ^ r.sign)) {
+                doubleDSetNan(&l);
+            }
+        }
+        else if (doubleDIsNan(r)) {
+            l = r;
+            l.sign ^= 1;
         }
         return l;
     }

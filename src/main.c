@@ -19,7 +19,7 @@ void Init()
 int main(void)
 {
     Init();
-    char  str[1024];
+    char  str[10240];
     char* p = str;
     fgets(str, sizeof str, stdin);
 
