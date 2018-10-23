@@ -1,6 +1,6 @@
 #! /bin/bash
 
-for i in {1..10000} ; do
+for i in {1..100} ; do
 
     node checker/generator.js > tmp/input 2> tmp/output
     ./double_calculator < tmp/input >> tmp/output
