@@ -1,6 +1,6 @@
 #! /bin/bash
 
-for i in {1..100} ; do
+for i in {1..10000} ; do
 
     node checker/generator.js > tmp/input 2> tmp/output
     ./double_calculator < tmp/input >> tmp/output
@@ -8,9 +8,9 @@ for i in {1..100} ; do
         :
     else
         echo -e '\033[1;4;31mWrong Answer\033[0m'
-        return
+        exit
     fi
-
+    echo "$i done"
 done
 
 echo -e '\033[5;32;45mAccepted\033[0m'

@@ -204,7 +204,7 @@ DOUBLED doubleDAdd(DOUBLED l,
         if (doubleDIsInf(l) && doubleDIsInf(r)) {
             if (l.sign ^ r.sign) {}
         }
-        else if (!doubleDIsInf(r))
+        else if (doubleDIsInf(r))
             l = r;
         return l;
     }
@@ -258,7 +258,7 @@ DOUBLED doubleDSub(DOUBLED l,
                 doubleDSetNan(&l);
             }
         }
-        else if (doubleDIsNan(r)) {
+        else if (doubleDIsInf(r)) {
             l = r;
             l.sign ^= 1;
         }
